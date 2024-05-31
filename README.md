@@ -2,7 +2,7 @@ Vamos a crear un proyecto en React Native que utiliza los mismos API que nuestro
 
 ### Paso 1: Set up el proyecto de React Native
 
-#### Using Expo CLI:
+Utilizamos el siguiente comando para crear un proyecto-ejemplo.
 
 ```bash
 npx create-expo-app --template   
