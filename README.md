@@ -21,6 +21,8 @@ Sigue las instrucciones en la consola para abrir la aplicación en tu dispositiv
 
 ### Paso 1: Set up
 
+React Native es un framework de desarrollo de aplicaciones móviles que permite a los desarrolladores crear aplicaciones móviles multiplataforma utilizando JavaScript y React. Expo es una plataforma de open source para crear aplicaciones universales con React Native.
+
 Utilizamos el siguiente comando para crear un proyecto-ejemplo.
 
 ```bash
@@ -33,7 +35,21 @@ Elegimos blank y le damos un nombre a nuestro proyecto.
 cd ReactNativeProject
 ```
 
+Instalamos las dependencias necesarias:
+
+```bash
+npm install
+```
+
+Abrimos el proyecto en VS code.
+
+Probamos la aplicación en nuestro dispositivo móvil con Expo Go.
+
 ### Paso 2: Implementación de componentes básicos: View, ScrollView, Text, TextInput, Image.
+
+Los componentes básicos de React Native son similares a los de React. Sin embargo, en lugar de usar HTML, usamos componentes de React Native como `View`, `Text`, `TextInput`, `Image`, etc.
+
+Estos componentes se utilizan para construir la interfaz de usuario de la aplicación. Por ejemplo `View` se utiliza para contener otros componentes, `Text` se utiliza para mostrar texto, `TextInput` se utiliza para la entrada de texto, `Image` se utiliza para mostrar imágenes, etc.
 
 Modificamos el archivo `App.js` para que se vea de la siguiente manera:
 
@@ -209,7 +225,11 @@ export default RegisterScreen;
 
 ### Paso 3: Expo Router (Navigator)
 
-React Navigation es una librería de enrutamiento y navegación para React Native. Instala React Navigation:
+Para esta parte vamos a usar React Navigation. 
+
+Necesitaremos los siguiente sub componentes, `@react-navigation/native` y `@react-navigation/stack`. Estos componentes nos permiten navegar entre pantallas en nuestra aplicación.
+
+Instala React Navigation:
 
 ```bash
 npm install @react-navigation/native @react-navigation/stack
@@ -287,6 +307,8 @@ const RegisterScreen = ({navigation}) => {
 
 ### Paso 4: Configuración de Axios para realizar llamadas a APIs REST.
 
+Axios como vimos la semana pasada, es una librería de JavaScript que se utiliza para realizar peticiones HTTP desde el navegador o desde Node.js. En React Native, Axios se puede utilizar para realizar peticiones HTTP a un servidor RESTful.
+
 Instala Axios:
 
 ```bash
@@ -348,6 +370,8 @@ import { register } from './api';
 
 
 ### Paso 5: Implementación de flujos de autenticación y manejo de tokens JWT usando AsyncStorage.
+
+AsyncStorage es una API de almacenamiento persistente simple y sin cifrado para React Native. Se utiliza para almacenar datos en el dispositivo del usuario de forma persistente.
 
 Instala AsyncStorage:
 
@@ -542,6 +566,10 @@ export default CoursesScreen;
 
 ### Paso 6: Uso de Expo Secure Store para el almacenamiento seguro de tokens y credenciales.
 
+Secure Store es una API de almacenamiento seguro para React Native que se utiliza para almacenar datos sensibles de forma segura en el dispositivo del usuario. Secure Store cifra los datos antes de almacenarlos en el dispositivo y los descifra cuando se recuperan.
+
+Para los proyectos, deberán utilizar secure storage para el guardado de tokens y credenciales.
+
 Instala Expo Secure Store:
 
 ```bash
@@ -583,6 +611,12 @@ export const logout = async () => {
 ```
 
 ### Paso 7: Implementación de notificaciones push en eventos específicos de la aplicación.
+
+Las notificaciones push son mensajes que se envían a los dispositivos móviles de los usuarios para informarles sobre eventos específicos de la aplicación. Las notificaciones push pueden ser enviadas por el servidor de la aplicación a los dispositivos móviles de los usuarios en tiempo real.
+
+En este ejemplo vamos a enviar una notificación push cuando el usuario inicie sesión en la aplicación. 
+
+Otros casos pueden ser cuando un usuario reciba un mensaje, cuando un usuario reciba una solicitud de amistad, etc.
 
 Instala Expo Notifications:
 
@@ -654,6 +688,10 @@ const LoginScreen = ({ navigation, setIsLoggedIn }) => {
 ```
 
 ### Paso 8: Entender que son Expo-Sensors y cómo implementarlos.
+
+Expo Sensors es una API de sensores para React Native que se utiliza para acceder a los sensores del dispositivo móvil, como el acelerómetro, el giroscopio, el magnetómetro, etc. Expo Sensors proporciona una interfaz sencilla para acceder a los datos de los sensores del dispositivo móvil y utilizarlos en la aplicación.
+
+Otros sensores más comunes son el uso de la cámara, el micrófono, el y el GPS. Recuerden que para el uso de estos sensores, se debe solicitar permisos al usuario. En sus proyectos, deberán utilizar 2 o más sensores.
 
 Instala Expo Sensors:
 
