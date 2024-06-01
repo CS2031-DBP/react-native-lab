@@ -1,15 +1,21 @@
 // src/LoginScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { login } from './api';
+import { requestPermissions, scheduleNotification } from './notificationHelper';
 
 const LoginScreen = ({ navigation, setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  useEffect(() => {
+    requestPermissions();
+  }, []);
+
   const handleLogin = async () => {
     try {
       await login(email, password);
+      await scheduleNotification('Login Successful', 'You have successfully logged in.');
       setIsLoggedIn(true);
     } catch (error) {
       console.error('Login failed', error);
