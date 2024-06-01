@@ -29,7 +29,7 @@ Utilizamos el siguiente comando para crear un proyecto-ejemplo.
 npx create-expo-app --template   
 ```
 
-Elegimos blank y le damos un nombre a nuestro proyecto.
+Elegimos **blank** y le damos un nombre a nuestro proyecto.
 
 ```bash
 cd ReactNativeProject
