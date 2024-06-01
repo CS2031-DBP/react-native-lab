@@ -19,7 +19,8 @@
     "react": "18.2.0",
     "react-native": "0.74.1",
     "expo-secure-store": "~13.0.1",
-    "expo-notifications": "~0.28.5"
+    "expo-notifications": "~0.28.5",
+    "expo-sensors": "~13.0.8"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
