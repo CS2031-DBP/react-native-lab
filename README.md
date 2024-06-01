@@ -1,6 +1,25 @@
-Vamos a crear un proyecto en React Native que utiliza los mismos API que nuestro proyecto anterior de react. Seguimos los siguientes pasos. 
+Vamos a crear un proyecto en React Native que utiliza los mismos API que nuestro proyecto anterior de react. Seguimos los siguientes pasos.
 
-### Paso 1: Set up el proyecto de React Native
+### Requisitos
+
+- Node.js: https://nodejs.org/
+- npm: https://nodejs.org/
+- Expo Go (en tu dispositivo móvil): https://expo.dev/client
+
+
+### Instrucciones
+
+Al final de cada paso asegurate de que tu aplicación funciona correctamente.
+
+Puedes Correr tu proyecto con el siguiente comando:
+
+```bash
+npx expo start
+```
+
+Sigue las instrucciones en la consola para abrir la aplicación en tu dispositivo móvil.
+
+### Paso 1: Set up
 
 Utilizamos el siguiente comando para crear un proyecto-ejemplo.
 
@@ -14,68 +33,44 @@ Elegimos blank y le damos un nombre a nuestro proyecto.
 cd ReactNativeProject
 ```
 
-### Paso 2: Instalamos las dependencies del API
+### Paso 2: Implementación de componentes básicos: View, ScrollView, Text, TextInput, Image.
 
-Entras a tu directorio del proyecto y instalas `axios`:
-
-```bash
-npm install axios
-```
-
-### Paso 3: Crear el servicio API
-
-Crea un nuevo archivo llamado `api.js` en el directorio `src`:
+Modificamos el archivo `App.js` para que se vea de la siguiente manera:
 
 ```javascript
-// src/api.js
-import axios from 'axios';
+import { StyleSheet, View } from 'react-native';
+import LoginScreen from './src/LoginScreen';
+import RegisterScreen from './src/RegisterScreen';
 
-const API_URL = 'http://52.3.234.203:8080'; 
+export default function App() {
+  return (
+    <View style={styles.container}>
+      <LoginScreen />
+      <RegisterScreen />
+    </View>
+  );
+}
 
-export const login = async (email, password) => {
-  const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-  return response.data;
-};
-
-export const register = async (name, email, password, isTeacher) => {
-  const response = await axios.post(`${API_URL}/auth/register`, { name, email, password, isTeacher });
-  return response.data;
-};
-
-export const listCourses = async (token) => {
-  const response = await axios.get(`${API_URL}/course`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return response.data;
-};
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 ```
 
-### Paso 4: Crear Componentes
-
-#### Login Component
-
-Crear `LoginScreen.js` en el directorio `src`:
+Creamos un nuevo archivo llamado `LoginScreen.js` en el directorio `src`:
 
 ```javascript
 // src/LoginScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { login } from './api';
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const handleLogin = async () => {
-    try {
-      const data = await login(email, password);
-      navigation.navigate('Courses', { token: data.token });
-    } catch (error) {
-      console.error('Login failed', error);
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -94,10 +89,9 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Enter your password"
         secureTextEntry
       />
-      <Button title="Login" onPress={handleLogin} />
+      <Button title="Login" />
       <Button
         title="Go to Register"
-        onPress={() => navigation.navigate('Register')}
       />
     </View>
   );
@@ -121,30 +115,18 @@ const styles = StyleSheet.create({
 export default LoginScreen;
 ```
 
-#### Register Component
-
-Crear `RegisterScreen.js` en el directorio `src`:
+Creamos un nuevo archivo llamado `RegisterScreen.js` en el directorio `src`:
 
 ```javascript
 // src/RegisterScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
-import { register } from './api';
 
-const RegisterScreen = ({ navigation }) => {
+const RegisterScreen = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isTeacher, setIsTeacher] = useState(false);
-
-  const handleRegister = async () => {
-    try {
-      await register(name, email, password, isTeacher);
-      navigation.navigate('Login');
-    } catch (error) {
-      console.error('Registration failed', error);
-    }
-  };
 
   const toggleCheckbox = () => {
     setIsTeacher(!isTeacher);
@@ -180,7 +162,7 @@ const RegisterScreen = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.checkboxLabel}>Are you a teacher?</Text>
       </View>
-      <Button title="Register" onPress={handleRegister} />
+      <Button title="Register" />
     </View>
   );
 };
@@ -225,121 +207,157 @@ const styles = StyleSheet.create({
 export default RegisterScreen;
 ```
 
-#### Courses Component
+### Paso 3: Expo Router (Navigator)
 
-Crear `CoursesScreen.js` en el directorio `src`:
-```javascript
-// src/CoursesScreen.js
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { listCourses } from './api';
-
-const CoursesScreen = ({ route }) => {
-  const { token } = route.params;
-  const [courses, setCourses] = useState([]);
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const data = await listCourses(token);
-        setCourses(data);
-      } catch (error) {
-        console.error('Failed to fetch courses', error);
-      }
-    };
-
-    fetchCourses();
-  }, [token]);
-
-  return (
-    <View style={styles.container}>
-      <Text>Courses:</Text>
-      <FlatList
-        data={courses}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.courseItem}>
-            <Text>{item.title}</Text>
-            <Text>{item.remaining_spots}</Text>
-          </View>
-        )}
-      />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  courseItem: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-});
-
-export default CoursesScreen;
-```
-
-### Paso 5: Navigation
-
-Usa React Navigation para cambiar entre pantallas. Instala React Navigation:
+React Navigation es una librería de enrutamiento y navegación para React Native. Instala React Navigation:
 
 ```bash
 npm install @react-navigation/native @react-navigation/stack
 ```
 
-Agrega la navegación a tu aplicación:
+Modifica el archivo `App.js` para agregar la navegación:
 
 ```javascript
-// App.js
-import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './src/LoginScreen';
 import RegisterScreen from './src/RegisterScreen';
-import CoursesScreen from './src/CoursesScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
-function App() {
+export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Login" component={LoginScreen}/>
         <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Courses" component={CoursesScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-export default App;
-
 ```
 
-### Paso 6: Correr el proyecto
+Realiza las siguientes modificaciones en los archivos `LoginScreen.js` y `RegisterScreen.js` para que funcionen con la navegación:
 
-Corre tu proyecto para ver los cambios:
+```javascript
+// src/LoginScreen.js
+
+//.
+//.
+//.
+
+const LoginScreen = ({navigation}) => {
+
+//.
+//.
+//.
+        <Button
+        title="Go to Register"
+        onPress={() => navigation.navigate('Register')}
+      />
+
+//.
+//.
+//.
+```
+
+```javascript
+// src/RegisterScreen.js
+
+//.
+//.
+//.
+
+const RegisterScreen = ({navigation}) => {
+
+//.
+//.
+//.
+
+      <Button title="Register" />
+      <Button
+        title="Go to Login"
+        onPress={() => navigation.navigate('Login')}
+      />
+
+//.
+//.
+//.
+```
+
+### Paso 4: Configuración de Axios para realizar llamadas a APIs REST.
+
+Instala Axios:
 
 ```bash
-npx expo start
+npm install axios
 ```
 
-### Paso 7: Agregamos async storage para guardar el token
+Crea un archivo llamado `api.js` en el directorio `src`:
 
-Instalamos async storage:
+```javascript
+// src/api.js
+
+import axios from 'axios';
+
+const API_URL = 'http://52.3.234.203:8080'; 
+
+export const register = async (name, email, password, isTeacher) => {
+  const response = await axios.post(`${API_URL}/auth/register`, { name, email, password, isTeacher });
+  return response.data;
+};
+```
+
+Modifica el archivo `RegisterScreen.js` para que utilice la función `register`:
+
+```javascript
+// src/RegisterScreen.js
+
+//.
+//.
+//.
+
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { register } from './api';
+
+//.
+//.
+//.
+
+  const [isTeacher, setIsTeacher] = useState(false);
+
+  const handleRegister = async () => {
+    try {
+      await register(name, email, password, isTeacher);
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Registration failed', error);
+    }
+  };
+
+//.
+//.
+//.
+
+      <Button title="Register" onPress={handleRegister} />
+
+//.
+//.
+//.
+```
+
+
+### Paso 5: Implementación de flujos de autenticación y manejo de tokens JWT usando AsyncStorage.
+
+Instala AsyncStorage:
 
 ```bash
 npm install @react-native-async-storage/async-storage
 ```
 
-Modificamos el archivo `api.js` para guardar el token en el dispositivo:
+Modifica el archivo `api.js` para que utilice AsyncStorage:
 
 ```javascript
-// src/api.js
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -371,82 +389,104 @@ export const logout = async () => {
 };
 ```
 
-Luego updateamos el archivo `LoginScreen.js` para que redireccione a la pantalla de cursos si ya hay un token guard
+Modifica el archivo `LoginScreen.js` para que utilice la función `login`:
 
 ```javascript
 // src/LoginScreen.js
-import React, { useState } from 'react';
+
+//.
+//.
+//.
+
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { login } from './api';
 
-const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const LoginScreen = ({ navigation, setIsLoggedIn }) => {
+
+//.
+//.
+//.
 
   const handleLogin = async () => {
     try {
       await login(email, password);
-      navigation.navigate('Courses');
+      setIsLoggedIn(true);
     } catch (error) {
       console.error('Login failed', error);
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <Text>Email:</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Enter your email"
-      />
-      <Text>Password:</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Enter your password"
-        secureTextEntry
-      />
+//.
+//.
+//.
+
       <Button title="Login" onPress={handleLogin} />
-      <Button
-        title="Go to Register"
-        onPress={() => navigation.navigate('Register')}
-      />
-    </View>
-  );
-};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
-  },
-});
-
-export default LoginScreen;
+//.
+//.
+//.
 ```
 
-### Paso 8: Agregamos un botón de logout
+Instala la librería de navegación de pestañas:
 
-Modificamos el archivo `CoursesScreen.js` para agregar un botón de logout:
+```bash
+npm install @react-navigation/bottom-tabs
+```
+
+Modifica el archivo `App.js` para que utilice el estado `isLoggedIn`:
+
+
 
 ```javascript
-// src/CoursesScreen.js
+import React, { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import LoginScreen from './src/LoginScreen';
+import RegisterScreen from './src/RegisterScreen';
+import CoursesScreen from './src/CoursesScreen';
+
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const AuthStack = ({ setIsLoggedIn }) => (
+  <Stack.Navigator initialRouteName="Login">
+    <Stack.Screen name="Login">
+      {props => <LoginScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+    </Stack.Screen>
+    <Stack.Screen name="Register" component={RegisterScreen} />
+  </Stack.Navigator>
+);
+
+const AppTabs = ({ setIsLoggedIn }) => (
+  <Tab.Navigator initialRouteName='Courses'>
+    <Tab.Screen name="Courses">
+      {props => <CoursesScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+    </Tab.Screen>
+  </Tab.Navigator>
+);
+
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  return (
+    <NavigationContainer>
+      {isLoggedIn ? <AppTabs setIsLoggedIn={setIsLoggedIn} /> : <AuthStack setIsLoggedIn={setIsLoggedIn}/>}
+    </NavigationContainer>
+  	);
+};
+
+export default App;
+```
+
+Crea un nuevo archivo llamado `CoursesScreen.js` en el directorio `src`:
+
+```javascript
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { listCourses, logout } from './api';
 
-const CoursesScreen = ({ navigation }) => {
+const CoursesScreen = ({ setIsLoggedIn }) => {
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
@@ -464,7 +504,7 @@ const CoursesScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     await logout();
-    navigation.navigate('Login');
+    setIsLoggedIn(false);
   };
 
   return (
@@ -476,7 +516,7 @@ const CoursesScreen = ({ navigation }) => {
         renderItem={({ item }) => (
           <View style={styles.courseItem}>
             <Text>{item.title}</Text>
-            <Text>{item.available_slots}</Text>
+            <Text>{item.remainingSpots}</Text>
           </View>
         )}
       />
@@ -500,26 +540,60 @@ const styles = StyleSheet.create({
 export default CoursesScreen;
 ```
 
-### Paso 9: Correr el proyecto
+### Paso 6: Uso de Expo Secure Store para el almacenamiento seguro de tokens y credenciales.
 
-Corre tu proyecto para ver los cambios:
+Instala Expo Secure Store:
 
 ```bash
-npx expo start
+npx expo install expo-secure-store
 ```
 
-### Paso 10: Agregando notificaciones push
+Modifica el archivo `api.js` para que utilice Secure Store:
 
-Instalamos las dependencias necesarias:
+```javascript
+import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
+
+const API_URL = 'http://52.3.234.203:8080'; 
+
+export const login = async (email, password) => {
+  const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+  await SecureStore.setItemAsync('token', response.data.token); // Store token securely
+  return response.data;
+};
+
+export const register = async (name, email, password, isTeacher) => {
+  const response = await axios.post(`${API_URL}/auth/register`, { name, email, password, isTeacher });
+  return response.data;
+};
+
+export const listCourses = async () => {
+  const token = await SecureStore.getItemAsync('token'); // Retrieve token securely
+  const response = await axios.get(`${API_URL}/course`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const logout = async () => {
+  await SecureStore.deleteItemAsync('token'); // Remove token securely
+};
+```
+
+### Paso 7: Implementación de notificaciones push en eventos específicos de la aplicación.
+
+Instala Expo Notifications:
 
 ```bash
 npx expo install expo-notifications
 ```
 
-Vamos a crear una notificación para cuando un usuario se logea exitosamente:
+Crea un archivo llamado `notificationHelper.js` en el directorio `src`:
 
 ```javascript
-// src/NotificationHelper.js
+// src/notificationHelper.js
 import * as Notifications from 'expo-notifications';
 
 export const requestPermissions = async () => {
@@ -549,7 +623,7 @@ export const scheduleNotification = async (title, body) => {
 };
 ```
 
-### Paso 11: Modificamos el archivo `LoginScreen.js` para que envíe una notificación cuando un usuario se logea exitosamente:
+Modifica el archivo `LoginScreen.js` para que utilice las funciones de notificación:
 
 ```javascript
 // src/LoginScreen.js
@@ -558,7 +632,7 @@ import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { login } from './api';
 import { requestPermissions, scheduleNotification } from './notificationHelper';
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({ navigation, setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -570,77 +644,54 @@ const LoginScreen = ({ navigation }) => {
     try {
       await login(email, password);
       await scheduleNotification('Login Successful', 'You have successfully logged in.');
-      navigation.navigate('Courses');
+      setIsLoggedIn(true);
     } catch (error) {
       console.error('Login failed', error);
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text>Email:</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Enter your email"
-      />
-      <Text>Password:</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Enter your password"
-        secureTextEntry
-      />
-      <Button title="Login" onPress={handleLogin} />
-      <Button
-        title="Go to Register"
-        onPress={() => navigation.navigate('Register')}
-      />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
-  },
-});
-
-export default LoginScreen;
+ 
+//.
+//.
+//.
 ```
 
-### Paso 12: Correr el proyecto
+### Paso 8: Entender que son Expo-Sensors y cómo implementarlos.
 
-Corre tu proyecto para ver las notificaciones en acción:
-
-```bash
-npx expo start
-```
-
-### Paso 13: Expo Sensors
-
-Vamos a crear un nuevo view donde podemos ver el sensor de aceleración en acción.
-
-Instalamos las dependencias necesarias:
+Instala Expo Sensors:
 
 ```bash
 npx expo install expo-sensors
 ```
 
-Creamos un nuevo archivo llamado `SensorScreen.js` en el directorio `src`:
+Modificamos el archivo `App.js` para agregar el tab de sensores:
 
 ```javascript
+import LoginScreen from './src/LoginScreen';
+import RegisterScreen from './src/RegisterScreen';
+import CoursesScreen from './src/CoursesScreen';
+import SensorScreen from './src/SensorScreen';
+
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+//.
+//.
+//.
+
+    <Tab.Screen name="Courses">
+      {props => <CoursesScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+    </Tab.Screen>
+    <Tab.Screen name="Sensor" component={SensorScreen} />
+  </Tab.Navigator>
+);
+
+//.
+//.
+//.
+```
+
+Crea un nuevo archivo llamado `SensorScreen.js` en el directorio `src`:
+
+```javascript
+// src/SensorScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
@@ -659,7 +710,7 @@ const SensorScreen = ({ navigation }) => {
         setData(accelerometerData);
       })
     );
-    Accelerometer.setUpdateInterval(1000); // Set update interval to 1 second
+    Accelerometer.setUpdateInterval(100); // Set update interval to 0.1 second
   };
 
   const _unsubscribe = () => {
@@ -704,105 +755,15 @@ const styles = StyleSheet.create({
 export default SensorScreen;
 ```
 
-### Paso 14: Agregamos la navegación a `SensorScreen` en `App.js`:
+### Final
 
-```javascript
-import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './src/LoginScreen';
-import RegisterScreen from './src/RegisterScreen';
-import CoursesScreen from './src/CoursesScreen';
-import SensorScreen from './src/SensorScreen';
-
-const Stack = createStackNavigator();
-
-function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Courses" component={CoursesScreen} />
-        <Stack.Screen name="Sensor" component={SensorScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-
-export default App;
-```
-
-### Paso 15: Agregamos un botón para navegar a `SensorScreen` en `CoursesScreen.js`:
-
-```javascript
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
-import { listCourses, logout } from './api';
-
-const CoursesScreen = ({ navigation }) => {
-  const [courses, setCourses] = useState([]);
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const data = await listCourses();
-        setCourses(data);
-      } catch (error) {
-        console.error('Failed to fetch courses', error);
-      }
-    };
-
-    fetchCourses();
-  }, []);
-
-  const handleLogout = async () => {
-    await logout();
-    navigation.navigate('Login');
-  };
-
-  return (
-    <View style={styles.container}>
-      <Text>Courses:</Text>
-      <FlatList
-        data={courses}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.courseItem}>
-            <Text>{item.title}</Text>
-            <Text>{item.available_slots}</Text>
-          </View>
-        )}
-      />
-      <Button title="Logout" onPress={handleLogout} />
-      <Button title="Go to Sensor" onPress={() => navigation.navigate('Sensor')} />
-    </View>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  courseItem: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-});
-
-export default CoursesScreen;
-```
-
-### Paso 16: Correr el proyecto
-
-Corre tu proyecto para ver el sensor de aceleración en acción:
+¡Felicidades! Has completado el proyecto de React Native. Ahora puedes ejecutar tu aplicación en tu dispositivo móvil y probarla.
 
 ```bash
 npx expo start
 ```
 
-### Final
+Sigue las instrucciones en la consola para abrir la aplicación en tu dispositivo móvil.
 
-¡Felicidades! Has completado el tutorial de React Native. Ahora puedes crear aplicaciones móviles con React Native y Expo. ¡Sigue adelante y crea algo increíble! 🚀
+¡Gracias por seguir este tutorial! Espero que hayas aprendido algo nuevo y emocionante. Si tienes alguna pregunta, no dudes en preguntar
+en el canal de Discord o directamente a través de mi correo electrónico.
