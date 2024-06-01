@@ -1,12 +1,22 @@
 // src/RegisterScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { register } from './api';
 
 const RegisterScreen = ({navigation}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isTeacher, setIsTeacher] = useState(false);
+
+  const handleRegister = async () => {
+    try {
+      await register(name, email, password, isTeacher);
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Registration failed', error);
+    }
+  };
 
   const toggleCheckbox = () => {
     setIsTeacher(!isTeacher);
@@ -42,7 +52,7 @@ const RegisterScreen = ({navigation}) => {
         </TouchableOpacity>
         <Text style={styles.checkboxLabel}>Are you a teacher?</Text>
       </View>
-      <Button title="Register" />
+      <Button title="Register" onPress={handleRegister} />
       <Button
         title="Go to Login"
         onPress={() => navigation.navigate('Login')}
