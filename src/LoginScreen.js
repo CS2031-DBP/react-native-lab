@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
-const LoginScreen = () => {
+
+const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -26,6 +27,7 @@ const LoginScreen = () => {
       <Button title="Login" />
       <Button
         title="Go to Register"
+        onPress={() => navigation.navigate('Register')}
       />
     </View>
   );

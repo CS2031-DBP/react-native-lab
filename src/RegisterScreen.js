@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 
-const RegisterScreen = () => {
+const RegisterScreen = ({navigation}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,6 +43,10 @@ const RegisterScreen = () => {
         <Text style={styles.checkboxLabel}>Are you a teacher?</Text>
       </View>
       <Button title="Register" />
+      <Button
+        title="Go to Login"
+        onPress={() => navigation.navigate('Login')}
+      />
     </View>
   );
 };
