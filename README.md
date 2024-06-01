@@ -1,4 +1,4 @@
-Vamos a crear un proyecto en React Native que utiliza los mismos API que nuestro proyecto anterior de react. Seguimos los siguientes pasos.
+Vamos a crear un proyecto en React Native que utiliza el mismo API que nuestro proyecto anterior de react. Seguimos los siguientes pasos.
 
 ### Requisitos
 
