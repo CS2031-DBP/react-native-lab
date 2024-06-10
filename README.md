@@ -691,7 +691,7 @@ const LoginScreen = ({ navigation, setIsLoggedIn }) => {
 
 Expo Sensors es una API de sensores para React Native que se utiliza para acceder a los sensores del dispositivo móvil, como el acelerómetro, el giroscopio, el magnetómetro, etc. Expo Sensors proporciona una interfaz sencilla para acceder a los datos de los sensores del dispositivo móvil y utilizarlos en la aplicación.
 
-Otros sensores más comunes son el uso de la cámara, el micrófono, el y el GPS. Recuerden que para el uso de estos sensores, se debe solicitar permisos al usuario. En sus proyectos, deberán utilizar 2 o más sensores.
+Otros sensores más comunes son el uso de la cámara, el micrófono, el y el GPS. Para utilizar estos sensores debes usar librerías específicas cómo `expo-camera` para la cámara y `expo-av` para el audio. Recuerden que para el uso de estos sensores, se debe solicitar permisos al usuario. En sus proyectos, deberán utilizar 2 o más sensores.
 
 Instala Expo Sensors:
 
